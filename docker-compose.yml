@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  ubuntu:
+    container_name: jdbc_node
+    build: .
+    platform: linux/x86_64
+    restart: on-failure
+    command: ["sleep", "infinity"]
+    volumes:
+      - ./:/home/ubuntu/jdbc-node
+    ports:
+      - '3000:3000'
