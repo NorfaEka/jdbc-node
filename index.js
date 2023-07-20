@@ -1,29 +1,24 @@
 const express = require('express');
-const odbc = require('odbc');
+const ODBCConn = require("./odbc_conn");
 
 require('dotenv').config();
 BigInt.prototype.toJSON = function() { return this.toString() }
 
 const app = express();
 
-// ODBC configuration
-const config = {
-    connectionString: process.env.ODBC_CONNECTION_STRING,
-};
+let odbcConn = new ODBCConn(process.env.ODBC_CONNECTION_STRING);
 
 app.get('/', async (req, res) => {
     try {
-        let tableName = req.query['tableName'] || 'PA_Adm';
+        let tableName = req.query['tableName'] || 'SQLUser.PA_Adm';
         let count = req.query['count'] || '10';
-        const connection = await odbc.connect(config);
 
-        const result = await connection.query(`SELECT TOP ${count} * FROM SQLUser.${tableName}`);
+        let result = await odbcConn.query(tableName, count);
 
-        await res.json({
+        res.json({
             "status": "OK",
             result
         });
-        await connection.close();
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
